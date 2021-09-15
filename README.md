@@ -1,2 +1,2 @@
-# pwm
-Basic Password Manager in Python
+# PWM
+PWM is a simple CLI Password Manager written in Python
