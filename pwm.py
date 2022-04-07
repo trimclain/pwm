@@ -7,18 +7,21 @@ from os.path import join, isfile, isdir
 from sys import path
 from time import sleep
 
-DELAY = 0.1
+# In case I want to add a delay between commands to make it seem like it's working :)
+DELAY = 0
 PATH = join(path[0], 'db')
 ACCPATH = join(PATH, 'accs')
-# If folders don't exist, create them
+
+# If necessary folders don't exist, create them
 if not isdir(PATH):
     mkdir(PATH)
 if not isdir(ACCPATH):
     mkdir(ACCPATH)
 
+
 # --- Functions ---
 def welcome() -> None:
-    print('\n' + '\n' + '*'*45)
+    print('\n' + '\n' + '*' * 45)
     print('Commands:')
     print('exit — quit the program')
     print('add — add new account data')
@@ -26,19 +29,18 @@ def welcome() -> None:
     print('ls — show the list of accounts')
     print('rm — delete existing account data')
     print('clear — clear the screen')
-    print('*'*45)
+    print('*' * 45)
+
 
 def verify_passphrase(passphrase: str) -> bool:
     with open(join(PATH, '.passphrase'), 'r') as f:
         data = f.read()
-    if passphrase == data:
-        return True
-    return False
+    return passphrase == data
+
 
 def passphrase_exists() -> bool:
-    if isfile(join(PATH, '.passphrase')):
-        return True
-    return False
+    return isfile(join(PATH, '.passphrase'))
+
 
 def create_passphrase() -> None:
     passphrase = input('Create your PWM password: ')
@@ -46,17 +48,96 @@ def create_passphrase() -> None:
         f.write(passphrase)
 
 
-if __name__ == '__main__':
-    if passphrase_exists():
-        passphrase = getpass('Enter your PWM password: ')
-        if verify_passphrase(passphrase):
+def get_list_of_filenames() -> list:
+    # Get the list of files
+    files = listdir(ACCPATH)
+    # Return a sorted list of filenames without extension
+    return sorted([file.split('.')[0] for file in files])
 
+
+def check_accname_for_matches_and_perform_action(
+    accname: str, action, filenames: list, passphrase=''
+) -> None:
+    match_found = False
+    # Check if accountname exists in filenames
+    for name in filenames:
+        # If it fully matches
+        if accname == name:
+            match_found = True
+            # passphrase is needed for print_account_data action
+            action(accname) if not passphrase else action(accname, passphrase)
+            break
+        # If it matches partially, suggest the one match
+        elif accname in name:
+            answer = input(f'Did you mean {name}? ')
+            if answer.lower() in 'yes':
+                match_found = True
+                action(name) if not passphrase else action(name, passphrase)
+                break
+    if not match_found:
+        print('Try again or enter a new command.')
+
+
+def add_account(accname, acclogin, accpassw, passphrase):
+    # Create the message
+    data = acclogin + ' ' + accpassw
+
+    # Save the data
+    outfile = join(ACCPATH, accname + '.dat')
+    token = encryptor.encrypt(data, passphrase)
+    with open(outfile, 'wb') as file:
+        file.write(token)
+    print('Data saved successfully.')
+
+
+def print_account_data(accname: str, passphrase: str) -> None:
+    infile = join(ACCPATH, accname + '.dat')
+
+    try:
+        # Access the data
+        with open(infile, 'rb') as file:
+            token = file.read()
+        data = decryptor.decrypt(token, passphrase)
+        acclogin = data.split(' ')[0]
+        accpassw = data.split(' ')[1]
+
+        # Print the data
+        print('\n' + 'Your ' + accname + ' data:')
+        print('Login: ' + acclogin)
+        print('Password: ' + accpassw)
+
+    except FileNotFoundError:
+        print('There\'s no such account in the database.')
+
+
+def delete_account(accname: str) -> None:
+    filepath = join(ACCPATH, accname + '.dat')
+    remove(filepath)
+    print('Account successfully deleted.')
+
+
+def main():
+
+    if not passphrase_exists():
+        create_passphrase()
+        print('PWM password created successfully.')
+        print('Restart pwm.')
+
+    else:
+        passphrase = getpass('Enter your PWM password: ')
+
+        if not verify_passphrase(passphrase):
+            print('Wrong Password.')
+            print('Reastart pwm to try again.')
+            sleep(DELAY)
+
+        else:
             # Program
             welcome()
             while True:
                 input_ = input('\n' + ': ')
 
-                if input_ == 'exit' or input_ == 'quit' or input_ == 'q':
+                if input_ in ['exit', 'quit', 'q']:
                     _ = system('clear')
                     break
 
@@ -65,44 +146,20 @@ if __name__ == '__main__':
                     accname = input('Name of the account: ')
                     acclogin = input('Login: ')
                     accpassw = input('Password: ')
-
-                    # Create the message
-                    data = acclogin + ' ' + accpassw
-
-                    # Save the data
-                    outfile = join(ACCPATH, accname + '.dat')
-                    token = encryptor.encrypt(data, passphrase)
-                    with open(outfile, 'wb') as file:
-                        file.write(token)
-                    print('Data saved successfully.')
+                    add_account(accname, acclogin, accpassw, passphrase)
                     sleep(DELAY)
 
                 elif input_ == 'get':
                     # Get the name
                     accname = input('Name of the account: ')
-                    infile = join(ACCPATH, accname + '.dat')
-
-                    try:
-                        # Access the data
-                        with open(infile, 'rb') as file:
-                            token = file.read()
-                        data = decryptor.decrypt(token, passphrase)
-                        acclogin = data.split(' ')[0]
-                        accpassw = data.split(' ')[1]
-
-                        # Print the data
-                        print('\n' + 'Your ' + accname + ' data:')
-                        print('Login: ' + acclogin)
-                        print('Password: ' + accpassw)
-                        sleep(DELAY)
-
-                    except FileNotFoundError:
-                        print('There\'s no such account in the database.')
-                        sleep(DELAY)
+                    filenames = get_list_of_filenames()
+                    check_accname_for_matches_and_perform_action(
+                        accname, print_account_data, filenames, passphrase
+                    )
+                    sleep(DELAY)
 
                 elif input_ == 'ls':
-                    files = listdir(ACCPATH)
-                    filenames = [file.split('.')[0] for file in files]
+                    filenames = get_list_of_filenames()
                     if filenames:
                         print('\n' + 'List of accounts:')
                         for pos, file in enumerate(filenames):
@@ -112,10 +169,15 @@ if __name__ == '__main__':
                     sleep(DELAY)
 
                 elif input_ == 'rm':
-                    accname = input('Name of the website to delete: ')
-                    filepath = join(ACCPATH, accname + '.dat')
-                    remove(filepath)
-                    print('Account successfully deleted.')
+                    filenames = get_list_of_filenames()
+                    # Check if there are any files
+                    if filenames:
+                        accname = input('Name of the account to delete: ')
+                        check_accname_for_matches_and_perform_action(
+                            accname, delete_account, filenames
+                        )
+                    else:
+                        print('List of accounts is empty.')
                     sleep(DELAY)
 
                 elif input_ == 'clear':
@@ -125,12 +187,7 @@ if __name__ == '__main__':
                 else:
                     print('Unknown Command')
                     sleep(DELAY)
-        else:
-            print('Wrong Password.')
-            print('Reastart pwm to try again.')
-            sleep(DELAY)
 
-    else:
-        create_passphrase()
-        print('PWM password created successfully.')
-        print('Restart pwm.')
+
+if __name__ == '__main__':
+    main()
