@@ -8,15 +8,19 @@ all:
 help:
 	@echo "Run 'make' to create the venv"
 	@echo "Run 'make install_reqs' after sourcing the venv to install modules requirements.txt"
-	@echo "Run 'make install' to copy the executable to ~/.local/bin
+	@echo "Run 'make install' to be able to run pwm from anywhere
 
 install_reqs:
 	@# Install required modules
-	pip install -r requirements.txt
+	@echo "Installing requirements..."
+	@pip install -r requirements.txt
+	@echo "Done"
 
-# TODO:
 install:
-	@# Copy the executable to a folder in PATH (.local/bin)
-	cp ./pwm.py ~/.local/bin/pwm
+	@echo "Creating an executable in .local/bin..."
+	@# Create an executable in .local/bin
+	@./install.py
+	@echo "Done"
+	@echo "Now you can run pwm from anywhere by typing 'pwm'"
 
 .PHONY: all help install_reqs install
