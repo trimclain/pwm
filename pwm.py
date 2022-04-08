@@ -30,6 +30,7 @@ def welcome() -> None:
     print('ls   | l     — show the list of accounts')
     print('rm   | d     — delete existing account data')
     print('clear        — clear the screen')
+    print('reset        — reset PWM password')
     print('*' * 45)
 
 
@@ -47,6 +48,12 @@ def create_passphrase() -> None:
     passphrase = input('Create your PWM password: ')
     with open(join(PATH, '.passphrase'), 'w') as f:
         f.write(passphrase)
+
+
+def delete_passphrase() -> None:
+    remove(join(PATH, '.passphrase'))
+    rmtree(ACCPATH)
+    print('Password reset successfully. Restart PWM to create a new password.')
 
 
 def get_list_of_filenames() -> list:
@@ -80,7 +87,7 @@ def check_accname_for_matches_and_perform_action(
         print('Try again or enter a new command.')
 
 
-def add_account(accname, acclogin, accpassw, passphrase):
+def add_account(accname: str, acclogin: str, accpassw: str, passphrase: str) -> None:
     # Create the message
     data = acclogin + ' ' + accpassw
 
@@ -185,6 +192,8 @@ def main():
                                 rmtree(ACCPATH)
                                 mkdir(ACCPATH)
                                 print('All accounts have been successfully deleted.')
+                            elif answer.lower() in ['no', 'n']:
+                                pass
                             else:
                                 print(
                                     'To confirm deletion of all accounts',
@@ -201,6 +210,21 @@ def main():
                 elif input_ == 'clear':
                     _ = system('clear')
                     welcome()
+
+                elif input_ == 'reset':
+                    answer = input(
+                        'WARNING: All accounts will be deleted. Do you want to continue? '
+                    )
+                    if answer.lower() == 'yes':
+                        delete_passphrase()
+                        break
+                    elif answer.lower() in ['no', 'n']:
+                        pass
+                    else:
+                        print(
+                            'To confirm password reset',
+                            'you need to type in "yes"',
+                        )
 
                 else:
                     print('Unknown Command')
