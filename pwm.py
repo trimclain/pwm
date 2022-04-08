@@ -25,7 +25,7 @@ def welcome() -> None:
     print('Commands:')
     print('exit — quit the program')
     print('add — add new account data')
-    print('get — get existing account data')
+    print('read — get existing account data')
     print('ls — show the list of accounts')
     print('rm — delete existing account data')
     print('clear — clear the screen')
@@ -149,7 +149,7 @@ def main():
                     add_account(accname, acclogin, accpassw, passphrase)
                     sleep(DELAY)
 
-                elif input_ == 'get':
+                elif input_ == 'read':
                     # Get the name
                     accname = input('Name of the account: ')
                     filenames = get_list_of_filenames()
