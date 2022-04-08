@@ -1,11 +1,15 @@
 # PWM
-PWM is a simple CLI Password Manager written in Python
+PWM is a simple CLI Password Manager written in Python.
+It uses [cryptography](https://pypi.org/project/cryptography/)
+and its [Fernet](https://cryptography.io/en/latest/fernet/) encryption.
 
-## How does it work
-PWM uses cryptography library in Python and its encryption to Fernet tokens
+## How to install
 
-## Prerequisites
-- Install cryptography with `pip install cryptography`
+- (Recommended) To install PWM for current user run `make install`.
+  Now you can run `pwm` from anywhere to launch PWM
 
-## Getting Started
-To launch pwm type `./pwm.py` from inside of this folder
+- To install the venv, the requirements and run pwm from this folder:
+    1. `make`
+    2. `source venv/bin/activate`
+    3. `make install_reqs`
+    4. `./pwm.py`
