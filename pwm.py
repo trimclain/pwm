@@ -22,6 +22,7 @@ if not isdir(ACCPATH):
 
 # --- Functions ---
 def welcome() -> None:
+    """Print the header"""
     print('\n' + '\n' + '*' * 45)
     print('Commands:')
     print('exit | q     — quit the program')
@@ -35,28 +36,33 @@ def welcome() -> None:
 
 
 def verify_passphrase(passphrase: str) -> bool:
+    """Verify PWM Password"""
     with open(join(PATH, '.passphrase'), 'r') as f:
         data = f.read()
     return passphrase == data
 
 
 def passphrase_exists() -> bool:
+    """Check if PWM Password"""
     return isfile(join(PATH, '.passphrase'))
 
 
 def create_passphrase() -> None:
+    """Create new PWM Password"""
     passphrase = input('Create your PWM password: ')
     with open(join(PATH, '.passphrase'), 'w') as f:
         f.write(passphrase)
 
 
 def delete_passphrase() -> None:
+    """Delete PWM Password and all data from db/accs folder"""
     remove(join(PATH, '.passphrase'))
     rmtree(ACCPATH)
     print('Password reset successfully. Restart PWM to create a new password.')
 
 
 def get_list_of_filenames() -> list:
+    """Get the list of files in db/accs folder without .dat extension"""
     # Get the list of files
     files = listdir(ACCPATH)
     # Return a sorted list of filenames without extension
@@ -66,6 +72,11 @@ def get_list_of_filenames() -> list:
 def check_accname_for_matches_and_perform_action(
     accname: str, action, filenames: list, passphrase=''
 ) -> None:
+    """
+    This function does main work for rm and read commands. It's main purpose is to suggest
+    to user the account names to read from or delete based on what the input is closest to.
+    Example: Input: 'Am' => Suggestion 'Amazon'
+    """
     match_found = False
     # Check if accountname exists in filenames
     for name in filenames:
@@ -88,6 +99,7 @@ def check_accname_for_matches_and_perform_action(
 
 
 def add_account(accname: str, acclogin: str, accpassw: str, passphrase: str) -> None:
+    """I chose good function names so it's pretty clear that this function adds an acc to db"""
     # Create the message
     data = acclogin + ' ' + accpassw
 
@@ -100,6 +112,7 @@ def add_account(accname: str, acclogin: str, accpassw: str, passphrase: str) -> 
 
 
 def print_account_data(accname: str, passphrase: str) -> None:
+    """Read login and password for the given account in the database"""
     infile = join(ACCPATH, accname + '.dat')
 
     try:
@@ -120,6 +133,7 @@ def print_account_data(accname: str, passphrase: str) -> None:
 
 
 def delete_account(accname: str) -> None:
+    """Deletes an account from the database"""
     filepath = join(ACCPATH, accname + '.dat')
     remove(filepath)
     print('Account successfully deleted.')
@@ -141,7 +155,7 @@ def main():
             sleep(DELAY)
 
         else:
-            # Program
+            # Actual Program
             welcome()
             while True:
                 input_ = input('\n' + ': ')
