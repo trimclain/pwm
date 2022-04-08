@@ -71,7 +71,8 @@ def check_accname_for_matches_and_perform_action(
         # If it matches partially, suggest the one match
         elif accname in name:
             answer = input(f'Did you mean {name}? ')
-            if answer.lower() in 'yes':
+            # Yes or Enter confirms it
+            if answer.lower() in ['yes', 'y', 'ye', '\n']:
                 match_found = True
                 action(name) if not passphrase else action(name, passphrase)
                 break
@@ -176,11 +177,19 @@ def main():
                         accname = input('Name of the account to delete: ')
                         # If '*' is given, delete whole database
                         if accname == '*':
-                            answer = input('Are you sure you want to delete all accounts? ')
-                            if answer.lower() in 'yes':
+                            answer = input(
+                                'Are you sure you want to delete all accounts? '
+                            )
+                            # Only yes confirms since consequenses are more serious
+                            if answer.lower() == 'yes':
                                 rmtree(ACCPATH)
                                 mkdir(ACCPATH)
                                 print('All accounts have been successfully deleted.')
+                            else:
+                                print(
+                                    'To confirm deletion of all accounts',
+                                    'you need to type in "yes"',
+                                )
                         else:
                             check_accname_for_matches_and_perform_action(
                                 accname, delete_account, filenames
