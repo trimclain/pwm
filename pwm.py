@@ -4,6 +4,7 @@ from scripts import encryptor, decryptor
 from getpass import getpass
 from os import listdir, remove, mkdir, system
 from os.path import join, isfile, isdir
+from shutil import rmtree
 from sys import path
 from time import sleep
 
@@ -23,12 +24,12 @@ if not isdir(ACCPATH):
 def welcome() -> None:
     print('\n' + '\n' + '*' * 45)
     print('Commands:')
-    print('exit — quit the program')
-    print('add — add new account data')
-    print('read — get existing account data')
-    print('ls — show the list of accounts')
-    print('rm — delete existing account data')
-    print('clear — clear the screen')
+    print('exit | q     — quit the program')
+    print('add  | a     — add new account data')
+    print('read | r     — get existing account data')
+    print('ls   | l     — show the list of accounts')
+    print('rm   | d     — delete existing account data')
+    print('clear        — clear the screen')
     print('*' * 45)
 
 
@@ -137,11 +138,11 @@ def main():
             while True:
                 input_ = input('\n' + ': ')
 
-                if input_ in ['exit', 'quit', 'q']:
+                if input_ in ['exit', 'q']:
                     _ = system('clear')
                     break
 
-                elif input_ == 'add':
+                elif input_ in ['add', 'a']:
                     # Get the data
                     accname = input('Name of the account: ')
                     acclogin = input('Login: ')
@@ -149,7 +150,7 @@ def main():
                     add_account(accname, acclogin, accpassw, passphrase)
                     sleep(DELAY)
 
-                elif input_ == 'read':
+                elif input_ in ['read', 'r']:
                     # Get the name
                     accname = input('Name of the account: ')
                     filenames = get_list_of_filenames()
@@ -158,7 +159,7 @@ def main():
                     )
                     sleep(DELAY)
 
-                elif input_ == 'ls':
+                elif input_ in ['ls', 'l']:
                     filenames = get_list_of_filenames()
                     if filenames:
                         print('\n' + 'List of accounts:')
@@ -168,14 +169,22 @@ def main():
                         print('List of accounts is empty.')
                     sleep(DELAY)
 
-                elif input_ == 'rm':
+                elif input_ in ['rm', 'd']:
                     filenames = get_list_of_filenames()
                     # Check if there are any files
                     if filenames:
                         accname = input('Name of the account to delete: ')
-                        check_accname_for_matches_and_perform_action(
-                            accname, delete_account, filenames
-                        )
+                        # If '*' is given, delete whole database
+                        if accname == '*':
+                            answer = input('Are you sure you want to delete all accounts? ')
+                            if answer.lower() in 'yes':
+                                rmtree(ACCPATH)
+                                mkdir(ACCPATH)
+                                print('All accounts have been successfully deleted.')
+                        else:
+                            check_accname_for_matches_and_perform_action(
+                                accname, delete_account, filenames
+                            )
                     else:
                         print('List of accounts is empty.')
                     sleep(DELAY)
