@@ -121,14 +121,14 @@ def main():
     if not passphrase_exists():
         create_passphrase()
         print('PWM password created successfully.')
-        print('Restart pwm.')
+        print('Restart PWM.')
 
     else:
         passphrase = getpass('Enter your PWM password: ')
 
         if not verify_passphrase(passphrase):
             print('Wrong Password.')
-            print('Reastart pwm to try again.')
+            print('Reastart PWM to try again.')
             sleep(DELAY)
 
         else:
