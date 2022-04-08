@@ -18,6 +18,8 @@ install_reqs:
 
 install: install_reqs
 	@echo "Creating an executable in .local/bin..."
+	@# Make sure ~/.local/bin exists
+	@mkdir -p ~/.local/bin
 	@# Create an executable in .local/bin
 	@./install.py
 	@echo "Done"
