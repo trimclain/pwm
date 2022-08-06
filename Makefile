@@ -8,7 +8,7 @@ all:
 help:
 	@echo "Run 'make' to create the venv"
 	@echo "Run 'make install_reqs' after sourcing the venv to install modules using requirements.txt"
-	@echo "Run 'make install' to be able to run PWM from anywhere
+	@echo "Run 'make install' to be able to run PWM from anywhere"
 
 install_reqs:
 	@# Install required modules
@@ -25,4 +25,9 @@ install: install_reqs
 	@echo "Done"
 	@echo "Now you can run PWM from anywhere by typing 'pwm'"
 
-.PHONY: all help install_reqs install
+uninstall:
+	@echo "Uninstalling YDT from .local/bin..."
+	@rm -f ~/.local/bin/ytd
+	@echo "YDT was successfully uninstalled"
+
+.PHONY: all help install_reqs install uninstall
