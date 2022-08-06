@@ -7,7 +7,7 @@ all:
 
 help:
 	@echo "Run 'make' to create the venv"
-	@echo "Run 'make install_reqs' after sourcing the venv to install modules requirements.txt"
+	@echo "Run 'make install_reqs' after sourcing the venv to install modules using requirements.txt"
 	@echo "Run 'make install' to be able to run PWM from anywhere
 
 install_reqs:
