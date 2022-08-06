@@ -6,10 +6,10 @@ and its [Fernet](https://cryptography.io/en/latest/fernet/) encryption.
 ## How to install
 
 - (Recommended) To install PWM for current user run `make install`.
-  Now you can run `pwm` from anywhere to launch PWM
+  Now you can run `pwm` from anywhere to launch PWM.
 
-- To install the venv, the requirements and run pwm from this folder:
+- To create the venv, install requirements and run pwm from this folder:
     1. `make`
     2. `source venv/bin/activate`
-    3. `make install_reqs`
+    3. `make reqs`
     4. `./pwm.py`
